@@ -4,7 +4,7 @@
 //
 //  Created by Jasmee Sengupta on 07/03/18.
 //  Copyright © 2018 Jasmee Sengupta. All rights reserved.
-//
+//  **Do not commit model inceptionv3, 94.7 MB not to be pushed to github**
 
 import UIKit
 import CoreML
@@ -14,14 +14,14 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var classifierLabel: UILabel!
-    //var model: Inceptionv3?
+    var model: Inceptionv3?
     
     override func viewDidLoad() {
         super.viewDidLoad()
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        //model = Inceptionv3()
+        model = Inceptionv3()
     }
     
     override func didReceiveMemoryWarning() {
@@ -103,7 +103,32 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         newImage.draw(in: CGRect(x: 0, y: 0, width: newImage.size.width, height: newImage.size.height))
         UIGraphicsPopContext()
         CVPixelBufferUnlockBaseAddress(pixelBuffer!, CVPixelBufferLockFlags(rawValue: 0))
+        predictTypeOf(image: pixelBuffer!)
         return newImage
+    }
+    
+    func predictTypeOf(image: CVPixelBuffer) {
+        
+        guard let prediction = try? model?.prediction(image: image) else {
+            print("No predictions for this image")
+            return
+        }
+        guard let possibility = prediction?.classLabel else {
+            return
+        }
+        classifierLabel.text = "I think you are a \(possibility)"
+        print(possibility)
+        
+        if let probabilities = prediction?.classLabelProbs { // [String: Double]
+            print(probabilities.count) //999 for inceptionv3
+            if let probability = probabilities[possibility] {
+                classifierLabel.text = classifierLabel.text! + " with a \(probability * 100)% certainty"
+                print("with a \(probability * 100)% certainty")
+            }
+        }
+//        if let features = prediction?.featureNames {
+//            print(features) // ["classLabel", "classLabelProbs"]
+//        }
     }
     
 }
