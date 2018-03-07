@@ -117,13 +117,11 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             return
         }
         classifierLabel.text = "I think you are a \(possibility)"
-        print(possibility)
         
         if let probabilities = prediction?.classLabelProbs { // [String: Double]
-            print(probabilities.count) //999 for inceptionv3
+            //print(probabilities.count) //999 for inceptionv3
             if let probability = probabilities[possibility] {
                 classifierLabel.text = classifierLabel.text! + " with a \(probability * 100)% certainty"
-                print("with a \(probability * 100)% certainty")
             }
         }
 //        if let features = prediction?.featureNames {
